@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Twitch Live</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script type="module" src="/main.js" defer></script>
+    </head>
+    <body>
+        <!-- Auth screen -->
+        <div id="auth-screen" class="screen">
+            <div class="auth-box">
+                <svg
+                    class="twitch-logo"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path
+                        d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"
+                    />
+                </svg>
+                <h1>Twitch Live</h1>
+                <p>Смотри за стримами на которые ты подписана</p>
+                <button id="login-btn">Войти через Twitch</button>
+                <p id="auth-status" class="status"></p>
+            </div>
+        </div>
+
+        <!-- Streams screen -->
+        <div id="streams-screen" class="screen hidden">
+            <header>
+                <div class="header-left">
+                    <svg
+                        class="twitch-logo-small"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                    >
+                        <path
+                            d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"
+                        />
+                    </svg>
+                    <span class="header-title">Live</span>
+                    <span id="stream-count" class="count-badge"></span>
+                </div>
+                <div class="header-right">
+                    <span id="last-updated" class="last-updated"></span>
+                    <input
+                        id="zoom-slider"
+                        type="range"
+                        min="160"
+                        max="520"
+                        step="40"
+                        title="Размер карточек"
+                    />
+                    <button id="refresh-btn" class="icon-btn" title="Обновить">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <path
+                                d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"
+                            ></path>
+                        </svg>
+                    </button>
+                    <button id="logout-btn" class="icon-btn" title="Выйти">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                            ></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <div id="streams-grid" class="streams-grid"></div>
+            <div id="empty-state" class="empty-state hidden">
+                <p>Никто не стримит прямо сейчас</p>
+            </div>
+        </div>
+    </body>
+</html>
