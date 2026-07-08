@@ -16,6 +16,7 @@ const logoutBtn = document.getElementById("logout-btn");
 const zoomSlider = document.getElementById("zoom-slider");
 
 let refreshTimer = null;
+const cardMap = new Map();
 
 function formatViewers(n) {
   return n >= 1000 ? (n / 1000).toFixed(1) + "K" : String(n);
@@ -32,7 +33,7 @@ function renderStream(stream) {
   card.className = "stream-card";
   card.innerHTML = `
     <div class="thumbnail-wrap">
-      <img src="${stream.thumbnail_url}" alt="${stream.user_name}" loading="lazy" />
+      <img src="${stream.thumbnail_url}?t=${Date.now()}" alt="${stream.user_name}" loading="lazy" />
       <span class="live-badge">LIVE</span>
       <span class="viewers-badge">${formatViewers(stream.viewer_count)}</span>
     </div>
@@ -50,16 +51,39 @@ function renderStream(stream) {
   return card;
 }
 
+function updateCard(card, stream) {
+  card.querySelector(".viewers-badge").textContent = formatViewers(stream.viewer_count);
+  const titleEl = card.querySelector(".card-title");
+  titleEl.textContent = stream.title || "—";
+  titleEl.title = stream.title;
+  const gameEl = card.querySelector(".card-game");
+  if (gameEl) gameEl.textContent = stream.game_name;
+}
+
 async function loadStreams() {
   refreshBtn.classList.add("spinning");
   try {
     const streams = await invoke("get_streams");
-    streamsGrid.innerHTML = "";
     if (streams.length === 0) {
       emptyState.classList.remove("hidden");
+      cardMap.forEach((card) => card.remove());
+      cardMap.clear();
     } else {
       emptyState.classList.add("hidden");
-      streams.forEach((s) => streamsGrid.appendChild(renderStream(s)));
+      const seen = new Set();
+      streams.forEach((s) => {
+        seen.add(s.user_login);
+        if (cardMap.has(s.user_login)) {
+          updateCard(cardMap.get(s.user_login), s);
+        } else {
+          const card = renderStream(s);
+          cardMap.set(s.user_login, card);
+        }
+        streamsGrid.appendChild(cardMap.get(s.user_login));
+      });
+      cardMap.forEach((card, login) => {
+        if (!seen.has(login)) { card.remove(); cardMap.delete(login); }
+      });
     }
     streamCount.textContent = streams.length;
     lastUpdated.textContent = timeSince(Date.now());
@@ -72,6 +96,8 @@ async function loadStreams() {
 
 function showAuth() {
   clearInterval(refreshTimer);
+  cardMap.clear();
+  streamsGrid.innerHTML = "";
   authScreen.classList.remove("hidden");
   streamsScreen.classList.add("hidden");
 }
