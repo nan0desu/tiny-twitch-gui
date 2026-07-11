@@ -1,10 +1,11 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "twitch-live",
-  "version": "0.1.0",
-  "identifier": "com.node.twitch-live",
+  "version": "0.1.1",
+  "identifier": "org.twitch-live",
   "build": {
-    "frontendDist": "../src"
+    "frontendDist": "../src",
+    "removeUnusedCommands": true
   },
   "app": {
     "withGlobalTauri": true,

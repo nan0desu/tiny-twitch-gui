@@ -1,6 +1,6 @@
 [package]
 name = "twitch-live"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
@@ -18,12 +18,11 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["objc-exception", "wry"], default-features = false }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-#reqwest = { version = "0.12", features = ["json"] }
-  reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
 tokio = { version = "1", features = ["full"] }
 url = "2"
 anyhow = "1"
@@ -32,3 +31,12 @@ urlencoding = "2"
 toml = "0.8"
 dirs = "6"
 
+[profile.dev]
+incremental = true
+
+[profile.release]
+panic = "abort" # Strip expensive panic clean-up logic
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+lto = true
+opt-level = "s" # Use 3 to optimize performance, z to optimize for size, and s for something in-between.
+strip = true
