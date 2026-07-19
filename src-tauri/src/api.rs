@@ -48,10 +48,21 @@ pub async fn get_user_id(client_id: &str, token: &str) -> Result<String> {
         .error_for_status()?
         .json()
         .await?;
-    Ok(resp.data.into_iter().next().map(|u| u.id).unwrap_or_default())
+    Ok(resp
+        .data
+        .into_iter()
+        .next()
+        .map(|u| u.id)
+        .unwrap_or_default())
 }
 
-pub async fn get_followed_streams(client_id: &str, token: &str, user_id: &str, thumb_w: u32, thumb_h: u32) -> Result<Vec<Stream>> {
+pub async fn get_followed_streams(
+    client_id: &str,
+    token: &str,
+    user_id: &str,
+    thumb_w: u32,
+    thumb_h: u32,
+) -> Result<Vec<Stream>> {
     let client = reqwest::Client::new();
     let resp: StreamsResponse = client
         .get("https://api.twitch.tv/helix/streams/followed")

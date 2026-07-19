@@ -52,7 +52,9 @@ function renderStream(stream) {
 }
 
 function updateCard(card, stream) {
-  card.querySelector(".viewers-badge").textContent = formatViewers(stream.viewer_count);
+  card.querySelector(".viewers-badge").textContent = formatViewers(
+    stream.viewer_count,
+  );
   const titleEl = card.querySelector(".card-title");
   titleEl.textContent = stream.title || "—";
   titleEl.title = stream.title;
@@ -82,7 +84,10 @@ async function loadStreams() {
         streamsGrid.appendChild(cardMap.get(s.user_login));
       });
       cardMap.forEach((card, login) => {
-        if (!seen.has(login)) { card.remove(); cardMap.delete(login); }
+        if (!seen.has(login)) {
+          card.remove();
+          cardMap.delete(login);
+        }
       });
     }
     streamCount.textContent = streams.length;
