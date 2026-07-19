@@ -9,6 +9,7 @@ pub struct Stream {
     pub viewer_count: u64,
     pub thumbnail_url: String,
     pub game_name: String,
+    pub tags: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -25,6 +26,8 @@ struct RawStream {
     thumbnail_url: String,
     #[serde(default)]
     game_name: String,
+    #[serde(default)]
+    tags: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -87,6 +90,7 @@ pub async fn get_followed_streams(
                 .replace("{width}", &thumb_w.to_string())
                 .replace("{height}", &thumb_h.to_string()),
             game_name: s.game_name,
+            tags: s.tags,
         })
         .collect();
 

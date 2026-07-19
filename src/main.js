@@ -35,6 +35,7 @@ function renderStream(stream) {
     <div class="thumbnail-wrap">
       <img src="${stream.thumbnail_url}?t=${Date.now()}" alt="${stream.user_name}" loading="lazy" />
       <span class="live-badge">LIVE</span>
+      ${stream.tags.some((t) => t.toLowerCase() === "2k") ? `<span class="tag-badge">2K</span>` : ""}
       <span class="viewers-badge">${formatViewers(stream.viewer_count)}</span>
     </div>
     <div class="card-info">
