@@ -35,6 +35,7 @@ function renderStream(stream) {
     <div class="thumbnail-wrap">
       <img src="${stream.thumbnail_url}?t=${Date.now()}" alt="${stream.user_name}" loading="lazy" />
       <span class="live-badge">LIVE</span>
+      ${stream.tags.some((t) => t.toLowerCase() === "2k") ? `<span class="tag-badge">2K</span>` : ""}
       <span class="viewers-badge">${formatViewers(stream.viewer_count)}</span>
     </div>
     <div class="card-info">
@@ -52,7 +53,9 @@ function renderStream(stream) {
 }
 
 function updateCard(card, stream) {
-  card.querySelector(".viewers-badge").textContent = formatViewers(stream.viewer_count);
+  card.querySelector(".viewers-badge").textContent = formatViewers(
+    stream.viewer_count,
+  );
   const titleEl = card.querySelector(".card-title");
   titleEl.textContent = stream.title || "—";
   titleEl.title = stream.title;
@@ -82,7 +85,10 @@ async function loadStreams() {
         streamsGrid.appendChild(cardMap.get(s.user_login));
       });
       cardMap.forEach((card, login) => {
-        if (!seen.has(login)) { card.remove(); cardMap.delete(login); }
+        if (!seen.has(login)) {
+          card.remove();
+          cardMap.delete(login);
+        }
       });
     }
     streamCount.textContent = streams.length;
