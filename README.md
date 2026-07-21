@@ -24,6 +24,10 @@
 4. Скопируй **Client ID**
 
 ## Разработка
+```bash
+fedora:
+dnf install gcc gcc-c++ gtk3-devel libsoup3-devel gdk-pixbuf2-devel pango-devel javascriptcoregtk4.1-devel atk-devel glib2-devel cairo-gobject-devel webkit2gtk4.1-devel
+```
 
 ```bash
 npm install
