@@ -109,6 +109,10 @@ async fn is_authenticated(state: State<'_, AppState>) -> Result<bool, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    env_logger::builder()
+        .filter_module("twitch_live", log::LevelFilter::Debug)
+        .init();
+
     let cfg = config::load().unwrap_or_else(|e| {
         eprintln!("config load error: {e}, using defaults");
         Config::default()

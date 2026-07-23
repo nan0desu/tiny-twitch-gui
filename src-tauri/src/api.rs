@@ -41,6 +41,7 @@ struct User {
 }
 
 pub async fn get_user_id(client_id: &str, token: &str) -> Result<String> {
+    log::debug!("GET /helix/users");
     let client = reqwest::Client::new();
     let resp: UsersResponse = client
         .get("https://api.twitch.tv/helix/users")
@@ -51,12 +52,14 @@ pub async fn get_user_id(client_id: &str, token: &str) -> Result<String> {
         .error_for_status()?
         .json()
         .await?;
-    Ok(resp
+    let id = resp
         .data
         .into_iter()
         .next()
         .map(|u| u.id)
-        .unwrap_or_default())
+        .unwrap_or_default();
+    log::debug!("got user_id={id}");
+    Ok(id)
 }
 
 pub async fn get_followed_streams(
@@ -66,19 +69,19 @@ pub async fn get_followed_streams(
     thumb_w: u32,
     thumb_h: u32,
 ) -> Result<Vec<Stream>> {
+    log::debug!("GET /helix/streams/followed user_id={user_id}");
     let client = reqwest::Client::new();
-    let resp: StreamsResponse = client
+    let response = client
         .get("https://api.twitch.tv/helix/streams/followed")
         .query(&[("user_id", user_id), ("first", "50")])
         .header("Client-Id", client_id)
         .bearer_auth(token)
         .send()
-        .await?
-        .error_for_status()?
-        .json()
         .await?;
+    log::debug!("streams response status={}", response.status());
+    let resp: StreamsResponse = response.error_for_status()?.json().await?;
 
-    let streams = resp
+    let streams: Vec<Stream> = resp
         .data
         .into_iter()
         .map(|s| Stream {
@@ -94,5 +97,6 @@ pub async fn get_followed_streams(
         })
         .collect();
 
+    log::info!("streams/followed: {} live", streams.len());
     Ok(streams)
 }
