@@ -1,7 +1,10 @@
 const { invoke } = window.__TAURI__.core;
+const { isPermissionGranted, requestPermission, sendNotification } =
+  window.__TAURI__.notification;
 
 const REFRESH_INTERVAL_MS = 60_000;
 let appConfig = null;
+let followNotify = null;
 
 const authScreen = document.getElementById("auth-screen");
 const streamsScreen = document.getElementById("streams-screen");
@@ -67,6 +70,7 @@ async function loadStreams() {
   refreshBtn.classList.add("spinning");
   try {
     const streams = await invoke("get_streams");
+    const streamers_notify = followNotify;
     if (streams.length === 0) {
       emptyState.classList.remove("hidden");
       cardMap.forEach((card) => card.remove());
@@ -153,7 +157,18 @@ logoutBtn.addEventListener("click", async () => {
 // При запуске загружаем конфиг и проверяем авторизацию
 (async () => {
   appConfig = await invoke("get_config");
+  followNotify = await appConfig.notify;
+
   const authed = await invoke("is_authenticated");
   if (authed) showStreams();
   else showAuth();
+
+  // Do you have permission to send a notification?
+  let permissionGranted = await isPermissionGranted();
+
+  // If not we need to request it
+  if (!permissionGranted) {
+    const permission = await requestPermission();
+    permissionGranted = permission === "granted";
+  }
 })();

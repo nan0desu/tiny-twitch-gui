@@ -6,6 +6,7 @@ use std::path::PathBuf;
 pub struct Config {
     pub thumbnails: ThumbnailConfig,
     pub player: PlayerConfig,
+    pub notify: NotifyConfig,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -21,6 +22,11 @@ pub struct PlayerConfig {
     pub command: Vec<String>,
 }
 
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct NotifyConfig {
+    pub notify: String,
+}
+
 impl Default for Config {
     fn default() -> Self {
         Self {
@@ -30,6 +36,9 @@ impl Default for Config {
             },
             player: PlayerConfig {
                 command: vec!["streamlink".into(), "{channel}".into()],
+            },
+            notify: NotifyConfig {
+                notify: String::from(""),
             },
         }
     }

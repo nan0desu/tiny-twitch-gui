@@ -101,7 +101,9 @@ async fn is_authenticated(state: State<'_, AppState>) -> Result<bool, String> {
         return Ok(false);
     }
 
-    *state.token.lock().unwrap() = Some(TokenData { access_token: saved.access_token });
+    *state.token.lock().unwrap() = Some(TokenData {
+        access_token: saved.access_token,
+    });
     *state.user_id.lock().unwrap() = Some(saved.user_id);
 
     Ok(true)
@@ -120,6 +122,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_notification::init())
         .manage(AppState {
             token: Mutex::new(None),
             user_id: Mutex::new(None),
