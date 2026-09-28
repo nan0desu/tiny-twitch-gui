@@ -170,7 +170,7 @@ loginBtn.addEventListener("click", async () => {
 
 refreshBtn.addEventListener("click", loadStreams);
 
-const ZOOM_KEY = "twitch-live-zoom";
+const ZOOM_KEY = "twitchclient-live-zoom";
 const savedZoom = localStorage.getItem(ZOOM_KEY) || "280";
 zoomSlider.value = savedZoom;
 document.documentElement.style.setProperty(

@@ -1,5 +1,5 @@
 [package]
-name = "twitch-live"
+name = "twitchclient-live"
 version = "2.0.0"
 description = "A Tauri App"
 authors = ["you"]

@@ -11,7 +11,7 @@ pub struct SavedSession {
 fn session_path() -> PathBuf {
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("twitch-live")
+        .join("twitchclient-live")
         .join("session.json")
 }
 

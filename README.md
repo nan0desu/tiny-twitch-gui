@@ -1,4 +1,4 @@
-# twitch-live
+# twitchclient-live
 
 A desktop client for watching the live streams you follow. Tauri + Rust + Vanilla JS. 
 
@@ -40,7 +40,7 @@ TWITCH_CLIENT_ID=xxxxxx npm run tauri dev
 ```bash
 TWITCH_CLIENT_ID=xxxxxx npm run tauri build -- --no-bundle
 ```
-Result: `src-tauri/target/release/twitch-live`
+Result: `src-tauri/target/release/twitchclient-live`
 
 **With package** (requires `xdg-utils` on the build machine for AppImage):
 ```bash
@@ -51,15 +51,15 @@ Artifacts in `src-tauri/target/release/bundle/`:
 
 | Format | Path |
 |--------|------|
-| .deb | `deb/twitch-live_*.deb` |
-| .rpm | `rpm/twitch-live-*.rpm` |
+| .deb | `deb/twitchclient-live_*.deb` |
+| .rpm | `rpm/twitchclient-live-*.rpm` |
 | AppImage | requires `sudo dnf install xdg-utils` |
 
 > The Client ID is baked into the binary during the build process—the environment variable is not needed at runtime.
 
 ## Configuration
 
-Created automatically upon first launch: `~/.config/twitch-live/config.toml`
+Created automatically upon first launch: `~/.config/twitchclient-live/config.toml`
 
 ```toml
 [thumbnails]
