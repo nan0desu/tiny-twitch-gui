@@ -33,7 +33,10 @@ pub struct PlayerConfig {
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct NotifyConfig {
-    pub notify: String,
+    /// Twitch logins to be notified about when they come online, matched
+    /// case-insensitively. An empty list disables notifications.
+    #[serde(default)]
+    pub streamers: Vec<String>,
 }
 
 impl Default for Config {
@@ -48,7 +51,7 @@ impl Default for Config {
                 command: vec!["streamlink".into(), "{channel}".into()],
             },
             notify: NotifyConfig {
-                notify: String::from(""),
+                streamers: Vec::new(),
             },
         }
     }

@@ -4,7 +4,8 @@ const { isPermissionGranted, requestPermission, sendNotification } =
 
 const REFRESH_INTERVAL_MS = 60_000;
 let appConfig = null;
-let followNotify = null;
+let notifyLogins = new Set();
+let notifyAllowed = false;
 
 const authScreen = document.getElementById("auth-screen");
 const streamsScreen = document.getElementById("streams-screen");
@@ -20,6 +21,43 @@ const zoomSlider = document.getElementById("zoom-slider");
 
 let refreshTimer = null;
 const cardMap = new Map();
+
+// login -> started_at последнего виденного эфира. Хранит именно started_at, а не
+// просто факт «был онлайн»: если стример на один опрос выпал из ответа API и
+// вернулся тем же эфиром, повторного уведомления не будет, а новая трансляция
+// придёт с новым started_at и уведомление даст.
+const liveSince = new Map();
+// Первая загрузка только заполняет liveSince: иначе при каждом запуске
+// приложения прилетал бы залп уведомлений про всех, кто уже в эфире.
+let liveSeeded = false;
+
+function notifyWentLive(stream) {
+  const parts = [stream.title, stream.game_name].filter(Boolean);
+  sendNotification({
+    title: `${stream.user_name} в эфире`,
+    body: parts.join(" · "),
+  });
+}
+
+function checkWentLive(streams) {
+  for (const s of streams) {
+    const known = liveSince.get(s.user_login);
+    const isNew = known === undefined || known !== s.started_at;
+    if (
+      isNew &&
+      liveSeeded &&
+      notifyAllowed &&
+      (notifyLogins.has(s.user_login.toLowerCase()) ||
+        notifyLogins.has(s.user_name.toLowerCase()))
+    ) {
+      notifyWentLive(s);
+    }
+  }
+
+  liveSince.clear();
+  streams.forEach((s) => liveSince.set(s.user_login, s.started_at));
+  liveSeeded = true;
+}
 
 function formatViewers(n) {
   return n >= 1000 ? (n / 1000).toFixed(1) + "K" : String(n);
@@ -105,7 +143,7 @@ async function loadStreams() {
   refreshBtn.classList.add("spinning");
   try {
     const streams = await invoke("get_streams");
-    const streamers_notify = followNotify;
+    checkWentLive(streams);
     if (streams.length === 0) {
       emptyState.classList.remove("hidden");
       cardMap.forEach((card) => card.remove());
@@ -142,6 +180,8 @@ async function loadStreams() {
 function showAuth() {
   clearInterval(refreshTimer);
   cardMap.clear();
+  liveSince.clear();
+  liveSeeded = false;
   streamsGrid.innerHTML = "";
   authScreen.classList.remove("hidden");
   streamsScreen.classList.add("hidden");
@@ -192,18 +232,22 @@ logoutBtn.addEventListener("click", async () => {
 // При запуске загружаем конфиг и проверяем авторизацию
 (async () => {
   appConfig = await invoke("get_config");
-  followNotify = await appConfig.notify;
+  notifyLogins = new Set(
+    (appConfig.notify?.streamers ?? [])
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean),
+  );
+
+  // Разрешение спрашиваем до первого опроса, чтобы notifyAllowed успел
+  // выставиться. Если список пуст — не дёргаем пользователя запросом вовсе.
+  if (notifyLogins.size > 0) {
+    notifyAllowed = await isPermissionGranted();
+    if (!notifyAllowed) {
+      notifyAllowed = (await requestPermission()) === "granted";
+    }
+  }
 
   const authed = await invoke("is_authenticated");
   if (authed) showStreams();
   else showAuth();
-
-  // Do you have permission to send a notification?
-  let permissionGranted = await isPermissionGranted();
-
-  // If not we need to request it
-  if (!permissionGranted) {
-    const permission = await requestPermission();
-    permissionGranted = permission === "granted";
-  }
 })();

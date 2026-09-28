@@ -75,7 +75,17 @@ refresh_minutes = 10
 [player]
 # Placeholders: {channel}, {url}
 command = ["xdg-open", "https://twitch.tv/{channel}"]
+
+[notify]
+# Desktop notification when one of these channels goes live. Logins are matched
+# case-insensitively; an empty list disables notifications entirely.
+streamers = ["shroud", "quin69"]
 ```
+
+Notifications only fire on a transition: channels that are already live when the
+app starts are recorded silently, so launching it never produces a burst. A
+channel that drops out of the API for one poll and returns within the same
+broadcast is not announced twice.
 
 Command examples:
 
