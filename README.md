@@ -1,29 +1,29 @@
 # twitch-live
 
-Десктопный клиент для просмотра live-стримов на которые ты подписана. Tauri + Rust + Vanilla JS.
+A desktop client for watching the live streams you follow. Tauri + Rust + Vanilla JS. 
 
-## Возможности
+## Features
 
-- Авторизация через Twitch OAuth (Implicit Flow, без client secret)
-- Список текущих стримов с превьюхами, зрителями и тайтлом
-- Автообновление каждые 60 секунд
-- Сессия сохраняется между перезапусками (~60 дней)
-- Настраиваемая команда для открытия стрима (mpv, vlc, браузер и т.д.)
+- Twitch OAuth authorization (Implicit Flow, no client secret)
+- List of live streams with previews, viewer counts, and titles
+- Auto-refresh every 60 seconds
+- Session persistence across restarts (~60 days)
+- Customizable command to open streams (mpv, vlc, browser, etc.)
 
-## Требования
+## Requirements
 
-- [Rust](https://rustup.rs/) (или через `mise install rust`)
-- Node.js 24 LTS (или через `mise install node`)
+- [Rust](https://rustup.rs/) (or via `mise install rust`)
+- Node.js 24 LTS (or via `mise install node`)
 - Linux: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`, `librsvg2-dev`, `libssl-dev`
 
-## Настройка Twitch-приложения
+## Twitch App Setup
 
-1. Зайди на [dev.twitch.tv/console](https://dev.twitch.tv/console) → **Register Your Application**
+1. Go to [dev.twitch.tv/console](https://dev.twitch.tv/console) → **Register Your Application**
 2. OAuth Redirect URL: `http://localhost:17563/callback`
 3. Category: Application Integration
-4. Скопируй **Client ID**
+4. Copy the **Client ID**
 
-## Разработка
+## Development
 ```bash
 fedora:
 dnf install gcc gcc-c++ gtk3-devel libsoup3-devel gdk-pixbuf2-devel pango-devel javascriptcoregtk4.1-devel atk-devel glib2-devel cairo-gobject-devel webkit2gtk4.1-devel
@@ -34,32 +34,32 @@ npm install
 TWITCH_CLIENT_ID=xxxxxx npm run tauri dev
 ```
 
-## Сборка
+## Build
 
-**Просто бинарь** (без пакета):
+**Binary only** (no package):
 ```bash
 TWITCH_CLIENT_ID=xxxxxx npm run tauri build -- --no-bundle
 ```
-Результат: `src-tauri/target/release/twitch-live`
+Result: `src-tauri/target/release/twitch-live`
 
-**С пакетом** (требует `xdg-utils` на машине сборки для AppImage):
+**With package** (requires `xdg-utils` on the build machine for AppImage):
 ```bash
 TWITCH_CLIENT_ID=xxxxxx npm run tauri build
 ```
 
-Артефакты в `src-tauri/target/release/bundle/`:
+Artifacts in `src-tauri/target/release/bundle/`:
 
-| Формат | Путь |
+| Format | Path |
 |--------|------|
 | .deb | `deb/twitch-live_*.deb` |
 | .rpm | `rpm/twitch-live-*.rpm` |
-| AppImage | требует `sudo dnf install xdg-utils` |
+| AppImage | requires `sudo dnf install xdg-utils` |
 
-> Client ID запекается в бинарник во время сборки — в рантайме переменная окружения не нужна.
+> The Client ID is baked into the binary during the build process—the environment variable is not needed at runtime.
 
-## Конфиг
+## Configuration
 
-Создаётся автоматически при первом запуске: `~/.config/twitch-live/config.toml`
+Created automatically upon first launch: `~/.config/twitch-live/config.toml`
 
 ```toml
 [thumbnails]
@@ -67,14 +67,14 @@ width = 440
 height = 248
 
 [player]
-# Плейсхолдеры: {channel}, {url}
+# Placeholders: {channel}, {url}
 command = ["xdg-open", "https://twitch.tv/{channel}"]
 ```
 
-Примеры команд:
+Command examples:
 
 ```toml
-# mpv через Streamlink
+# mpv via Streamlink
 command = ["streamlink", "twitch.tv/{channel}", "best"]
 
 # VLC
@@ -83,3 +83,4 @@ command = ["vlc", "https://twitch.tv/{channel}"]
 # Firefox
 command = ["firefox", "https://twitch.tv/{channel}"]
 ```
+
