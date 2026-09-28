@@ -90,3 +90,7 @@ command = ["vlc", "https://twitch.tv/{channel}"]
 command = ["firefox", "https://twitch.tv/{channel}"]
 ```
 
+## Copyright
+TWITCH, the TWITCH Logo, the Glitch Logo, and/or TWITCHTV are trademarks of Twitch Interactive, Inc. or its affiliates.
+
+This project uses the Twitch API. Not affiliated with, endorsed by, or sponsored by Twitch
