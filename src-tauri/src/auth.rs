@@ -9,15 +9,18 @@ pub fn redirect_uri() -> String {
     format!("http://localhost:{}/callback", REDIRECT_PORT)
 }
 
-pub fn build_auth_url(client_id: &str) -> String {
-    format!(
-        "https://id.twitch.tv/oauth2/authorize\
-        ?client_id={client_id}\
-        &redirect_uri={redirect}\
-        &response_type=token\
-        &scope=user%3Aread%3Afollows",
-        redirect = urlencoding::encode(&redirect_uri()),
-    )
+pub fn build_auth_url(client_id: &str) -> Result<String> {
+    let redirect = redirect_uri();
+    let url = url::Url::parse_with_params(
+        "https://id.twitch.tv/oauth2/authorize",
+        &[
+            ("client_id", client_id),
+            ("redirect_uri", redirect.as_str()),
+            ("response_type", "token"),
+            ("scope", "user:read:follows"),
+        ],
+    )?;
+    Ok(url.into())
 }
 
 pub async fn wait_for_token() -> Result<String> {

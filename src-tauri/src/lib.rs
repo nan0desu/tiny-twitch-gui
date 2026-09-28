@@ -18,7 +18,7 @@ struct AppState {
 
 #[tauri::command]
 async fn start_auth() -> Result<(), String> {
-    let url = auth::build_auth_url(CLIENT_ID);
+    let url = auth::build_auth_url(CLIENT_ID).map_err(|e| e.to_string())?;
     open::that(&url).map_err(|e| e.to_string())?;
     Ok(())
 }
@@ -121,7 +121,6 @@ pub fn run() {
     });
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .manage(AppState {
             token: Mutex::new(None),
