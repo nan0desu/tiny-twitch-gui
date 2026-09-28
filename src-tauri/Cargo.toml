@@ -1,6 +1,6 @@
 [package]
 name = "twitch-live"
-version = "0.1.3"
+version = "0.1.4"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2024"
@@ -24,17 +24,17 @@ tauri = { version = "2", features = ["objc-exception", "wry"], default-features 
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+reqwest = { version = "0.13", features = ["json", "query", "rustls"], default-features = false }
 tokio = { version = "1", features = ["full"] }
 url = "2"
 anyhow = "1"
 open = "5"
 urlencoding = "2"
 toml = "0.8"
-dirs = "6"
+dirs = "7"
 log = "0.4"
 env_logger = "0.11"
-tauri-plugin-notification = "2.3.3"
+tauri-plugin-notification = "2"
 
 [profile.dev]
 incremental = true
