@@ -10,6 +10,8 @@ pub struct Stream {
     pub thumbnail_url: String,
     pub game_name: String,
     pub tags: Vec<String>,
+    /// RFC 3339, as returned by Helix. Used by the UI to phase thumbnail refreshes.
+    pub started_at: String,
 }
 
 #[derive(Deserialize)]
@@ -28,6 +30,8 @@ struct RawStream {
     game_name: String,
     #[serde(default)]
     tags: Vec<String>,
+    #[serde(default)]
+    started_at: String,
 }
 
 #[derive(Deserialize)]
@@ -94,6 +98,7 @@ pub async fn get_followed_streams(
                 .replace("{height}", &thumb_h.to_string()),
             game_name: s.game_name,
             tags: s.tags,
+            started_at: s.started_at,
         })
         .collect();
 

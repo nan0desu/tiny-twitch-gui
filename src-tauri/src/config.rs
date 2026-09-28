@@ -13,6 +13,15 @@ pub struct Config {
 pub struct ThumbnailConfig {
     pub width: u32,
     pub height: u32,
+    /// How often a thumbnail is re-fetched, in minutes. Counted from that stream's
+    /// own start time, so cards reload at different moments instead of all at once.
+    /// A stream younger than this is left alone. 0 disables refreshing.
+    #[serde(default = "default_refresh_minutes")]
+    pub refresh_minutes: u32,
+}
+
+fn default_refresh_minutes() -> u32 {
+    10
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -33,6 +42,7 @@ impl Default for Config {
             thumbnails: ThumbnailConfig {
                 width: 440,
                 height: 248,
+                refresh_minutes: default_refresh_minutes(),
             },
             player: PlayerConfig {
                 command: vec!["streamlink".into(), "{channel}".into()],

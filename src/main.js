@@ -31,12 +31,46 @@ function timeSince(date) {
   return `${Math.floor(s / 60)} мин назад`;
 }
 
+// Превью обновляется раз в refresh_minutes, но отсчёт идёт от старта самого
+// стрима — стримы стартовали в разное время, поэтому сетка не перезагружается
+// целиком. Пока стриму меньше refresh_minutes, картинку не трогаем вовсе.
+function thumbUrl(stream) {
+  const periodMs = (appConfig?.thumbnails?.refresh_minutes ?? 0) * 60_000;
+  const ageMs = Date.now() - Date.parse(stream.started_at);
+  if (periodMs <= 0 || !Number.isFinite(ageMs) || ageMs < periodMs) {
+    return `${stream.thumbnail_url}?t=0`;
+  }
+  return `${stream.thumbnail_url}?t=${Math.floor(ageMs / periodMs)}`;
+}
+
+// Грузим новый кадр в стороне и показываем только готовый, иначе <img> моргает
+// пустотой на время загрузки.
+function refreshThumb(card, stream) {
+  const img = card.querySelector(".thumbnail-wrap img");
+  const next = thumbUrl(stream);
+  if (img.dataset.thumb === next || img.dataset.pending === next) return;
+
+  const pre = new Image();
+  img.dataset.pending = next;
+  pre.onload = () => {
+    img.src = next;
+    img.dataset.thumb = next;
+    delete img.dataset.pending;
+  };
+  pre.onerror = () => {
+    // Оставляем старый кадр и пробуем снова на следующем опросе.
+    delete img.dataset.pending;
+  };
+  pre.src = next;
+}
+
 function renderStream(stream) {
   const card = document.createElement("div");
   card.className = "stream-card";
+  const thumb = thumbUrl(stream);
   card.innerHTML = `
     <div class="thumbnail-wrap">
-      <img src="${stream.thumbnail_url}?t=${Date.now()}" alt="${stream.user_name}" loading="lazy" />
+      <img src="${thumb}" data-thumb="${thumb}" alt="${stream.user_name}" loading="lazy" />
       <span class="live-badge">LIVE</span>
       ${stream.tags.some((t) => t.toLowerCase() === "2k") ? `<span class="tag-badge">2K</span>` : ""}
       <span class="viewers-badge">${formatViewers(stream.viewer_count)}</span>
@@ -64,6 +98,7 @@ function updateCard(card, stream) {
   titleEl.title = stream.title;
   const gameEl = card.querySelector(".card-game");
   if (gameEl) gameEl.textContent = stream.game_name;
+  refreshThumb(card, stream);
 }
 
 async function loadStreams() {

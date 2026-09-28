@@ -65,6 +65,10 @@ Created automatically upon first launch: `~/.config/twitch-live/config.toml`
 [thumbnails]
 width = 440
 height = 248
+# How often a preview is re-fetched, in minutes. Counted from that stream's own
+# start time, so cards reload at different moments instead of all at once.
+# A stream younger than this keeps its first frame. 0 disables refreshing.
+refresh_minutes = 10
 
 [player]
 # Placeholders: {channel}, {url}
