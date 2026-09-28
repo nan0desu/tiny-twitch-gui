@@ -40,8 +40,8 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             thumbnails: ThumbnailConfig {
-                width: 440,
-                height: 248,
+                width: 640,
+                height: 360,
                 refresh_minutes: default_refresh_minutes(),
             },
             player: PlayerConfig {

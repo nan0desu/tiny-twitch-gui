@@ -63,8 +63,10 @@ Created automatically upon first launch: `~/.config/twitch-live/config.toml`
 
 ```toml
 [thumbnails]
-width = 440
-height = 248
+# Size requested from Twitch, in pixels. Worth keeping at or above the widest
+# card the zoom slider can produce (520 px), otherwise previews look blurry.
+width = 640
+height = 360
 # How often a preview is re-fetched, in minutes. Counted from that stream's own
 # start time, so cards reload at different moments instead of all at once.
 # A stream younger than this keeps its first frame. 0 disables refreshing.

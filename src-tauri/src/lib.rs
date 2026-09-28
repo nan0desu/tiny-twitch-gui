@@ -54,9 +54,16 @@ async fn get_streams(state: State<'_, AppState>) -> Result<Vec<api::Stream>, Str
         }
     };
 
-    let streams = api::get_followed_streams(CLIENT_ID, &token.access_token, &user_id, 640, 360)
-        .await
-        .map_err(|e| e.to_string())?;
+    // Scoped so the guard is dropped before the await below.
+    let (thumb_w, thumb_h) = {
+        let cfg = state.config.lock().unwrap();
+        (cfg.thumbnails.width, cfg.thumbnails.height)
+    };
+
+    let streams =
+        api::get_followed_streams(CLIENT_ID, &token.access_token, &user_id, thumb_w, thumb_h)
+            .await
+            .map_err(|e| e.to_string())?;
 
     Ok(streams)
 }
