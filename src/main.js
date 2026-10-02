@@ -18,23 +18,29 @@ const lastUpdated = document.getElementById("last-updated");
 const refreshBtn = document.getElementById("refresh-btn");
 const logoutBtn = document.getElementById("logout-btn");
 const zoomSlider = document.getElementById("zoom-slider");
+const aboutBtn = document.getElementById("about-btn");
+const aboutDialog = document.getElementById("about-dialog");
+const aboutVersion = document.getElementById("about-version");
+const aboutConfig = document.getElementById("about-config");
+const aboutRepo = document.getElementById("about-repo");
+const aboutClose = document.getElementById("about-close");
 
 let refreshTimer = null;
 const cardMap = new Map();
 
-// login -> started_at последнего виденного эфира. Хранит именно started_at, а не
-// просто факт «был онлайн»: если стример на один опрос выпал из ответа API и
-// вернулся тем же эфиром, повторного уведомления не будет, а новая трансляция
-// придёт с новым started_at и уведомление даст.
+// login -> started_at of the last broadcast seen. Keyed on started_at rather
+// than a plain "was online" flag: a channel that drops out of one poll and
+// returns within the same broadcast is not announced twice, while a genuinely
+// new broadcast arrives with a new started_at and does notify.
 const liveSince = new Map();
-// Первая загрузка только заполняет liveSince: иначе при каждом запуске
-// приложения прилетал бы залп уведомлений про всех, кто уже в эфире.
+// The first load only fills liveSince in. Otherwise every launch would fire a
+// burst of notifications about everyone who is already live.
 let liveSeeded = false;
 
 function notifyWentLive(stream) {
   const parts = [stream.title, stream.game_name].filter(Boolean);
   sendNotification({
-    title: `${stream.user_name} в эфире`,
+    title: `${stream.user_name} is live`,
     body: parts.join(" · "),
   });
 }
@@ -66,12 +72,12 @@ function formatViewers(n) {
 function timeSince(date) {
   const s = Math.floor((Date.now() - date) / 1000);
   if (s < 60) return "now";
-  return `${Math.floor(s / 60)} мин назад`;
+  return `${Math.floor(s / 60)} min ago`;
 }
 
-// Превью обновляется раз в refresh_minutes, но отсчёт идёт от старта самого
-// стрима — стримы стартовали в разное время, поэтому сетка не перезагружается
-// целиком. Пока стриму меньше refresh_minutes, картинку не трогаем вовсе.
+// A preview is re-fetched once every refresh_minutes, counted from that
+// stream's own start time. Streams started at different moments, so the grid
+// never reloads as a whole. Below refresh_minutes the image is left alone.
 function thumbUrl(stream) {
   const periodMs = (appConfig?.thumbnails?.refresh_minutes ?? 0) * 60_000;
   const ageMs = Date.now() - Date.parse(stream.started_at);
@@ -81,8 +87,8 @@ function thumbUrl(stream) {
   return `${stream.thumbnail_url}?t=${Math.floor(ageMs / periodMs)}`;
 }
 
-// Грузим новый кадр в стороне и показываем только готовый, иначе <img> моргает
-// пустотой на время загрузки.
+// Load the new frame aside and swap it in only once it is ready, otherwise
+// <img> blinks empty for the duration of the request.
 function refreshThumb(card, stream) {
   const img = card.querySelector(".thumbnail-wrap img");
   const next = thumbUrl(stream);
@@ -96,7 +102,7 @@ function refreshThumb(card, stream) {
     delete img.dataset.pending;
   };
   pre.onerror = () => {
-    // Оставляем старый кадр и пробуем снова на следующем опросе.
+    // Keep the old frame and retry on the next poll.
     delete img.dataset.pending;
   };
   pre.src = next;
@@ -196,14 +202,14 @@ function showStreams() {
 
 loginBtn.addEventListener("click", async () => {
   loginBtn.disabled = true;
-  authStatus.textContent = "Открываю браузер...";
+  authStatus.textContent = "Opening the browser...";
   try {
     await invoke("start_auth");
-    authStatus.textContent = "Жду авторизацию в браузере...";
+    authStatus.textContent = "Waiting for authorization in the browser...";
     await invoke("finish_auth");
     showStreams();
   } catch (e) {
-    authStatus.textContent = `Ошибка: ${e}`;
+    authStatus.textContent = `Error: ${e}`;
     loginBtn.disabled = false;
   }
 });
@@ -229,7 +235,36 @@ logoutBtn.addEventListener("click", async () => {
   showAuth();
 });
 
-// При запуске загружаем конфиг и проверяем авторизацию
+aboutBtn.addEventListener("click", async () => {
+  try {
+    const info = await invoke("app_info");
+    aboutVersion.textContent = info.version;
+    aboutConfig.textContent = info.config_path;
+  } catch (e) {
+    console.error(e);
+  }
+  aboutDialog.showModal();
+});
+
+aboutClose.addEventListener("click", () => aboutDialog.close());
+
+aboutRepo.addEventListener("click", () =>
+  invoke("open_repo").catch((e) => console.error(e)),
+);
+
+// Close on a backdrop click. Comparing against the bounding box rather than
+// e.target, because clicks on the dialog's own padding also target the dialog.
+aboutDialog.addEventListener("click", (e) => {
+  const r = aboutDialog.getBoundingClientRect();
+  const outside =
+    e.clientX < r.left ||
+    e.clientX > r.right ||
+    e.clientY < r.top ||
+    e.clientY > r.bottom;
+  if (outside) aboutDialog.close();
+});
+
+// On startup load the config and check authorization
 (async () => {
   appConfig = await invoke("get_config");
   notifyLogins = new Set(
@@ -238,8 +273,8 @@ logoutBtn.addEventListener("click", async () => {
       .filter(Boolean),
   );
 
-  // Разрешение спрашиваем до первого опроса, чтобы notifyAllowed успел
-  // выставиться. Если список пуст — не дёргаем пользователя запросом вовсе.
+  // Ask for permission before the first poll so notifyAllowed is settled by
+  // then. With an empty list the user is never prompted at all.
   if (notifyLogins.size > 0) {
     notifyAllowed = await isPermissionGranted();
     if (!notifyAllowed) {

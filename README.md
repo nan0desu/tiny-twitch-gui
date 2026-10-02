@@ -13,8 +13,8 @@ A desktop client for watching the live streams you follow. Tauri + Rust + Vanill
 ## Requirements
 
 - [Rust](https://rustup.rs/) (or via `mise install rust`)
-- Node.js 24 LTS (or via `mise install node`)
-- Linux: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`, `librsvg2-dev`, `libssl-dev`
+- Node.js 24/26 (or via `mise install node`)
+- Linux: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`, `librsvg2-dev`, `libssl-dev`, `libatomic`
 
 ## Twitch App Setup
 
@@ -26,7 +26,7 @@ A desktop client for watching the live streams you follow. Tauri + Rust + Vanill
 ## Development
 ```bash
 fedora:
-dnf install gcc gcc-c++ gtk3-devel libsoup3-devel gdk-pixbuf2-devel pango-devel javascriptcoregtk4.1-devel atk-devel glib2-devel cairo-gobject-devel webkit2gtk4.1-devel
+dnf install gcc gcc-c++ gtk3-devel libsoup3-devel gdk-pixbuf2-devel pango-devel javascriptcoregtk4.1-devel atk-devel glib2-devel cairo-gobject-devel webkit2gtk4.1-devel libatomic
 ```
 
 ```bash

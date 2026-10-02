@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,8 +21,8 @@
                     />
                 </svg>
                 <h1>Twitch Live</h1>
-                <p>Смотри за стримами на которые ты подписана</p>
-                <button id="login-btn">Войти через Twitch</button>
+                <p>Keep an eye on the streams you follow</p>
+                <button id="login-btn">Log in with Twitch</button>
                 <p id="auth-status" class="status"></p>
             </div>
         </div>
@@ -51,9 +51,9 @@
                         min="160"
                         max="520"
                         step="40"
-                        title="Размер карточек"
+                        title="Card size"
                     />
-                    <button id="refresh-btn" class="icon-btn" title="Обновить">
+                    <button id="refresh-btn" class="icon-btn" title="Refresh">
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
@@ -66,7 +66,19 @@
                             ></path>
                         </svg>
                     </button>
-                    <button id="logout-btn" class="icon-btn" title="Выйти">
+                    <button id="about-btn" class="icon-btn" title="About">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </button>
+                    <button id="logout-btn" class="icon-btn" title="Log out">
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
@@ -85,8 +97,38 @@
 
             <div id="streams-grid" class="streams-grid"></div>
             <div id="empty-state" class="empty-state hidden">
-                <p>Никто не стримит прямо сейчас</p>
+                <p>Nobody is streaming right now</p>
             </div>
         </div>
+
+        <!-- About dialog -->
+        <dialog id="about-dialog" class="about-dialog">
+            <svg class="twitch-logo" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                    d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"
+                />
+            </svg>
+            <h2>Tiny Twitch GUI</h2>
+            <p class="about-version">
+                Version <span id="about-version">—</span>
+            </p>
+            <p class="about-desc">
+                A desktop client for watching the live streams you follow.
+            </p>
+            <p class="about-copyright">
+                TWITCH, the TWITCH Logo, the Glitch Logo, and/or TWITCHTV are
+                trademarks of Twitch Interactive, Inc. or its affiliates. This
+                project uses the Twitch API. Not affiliated with, endorsed by,
+                or sponsored by Twitch
+            </p>
+            <dl class="about-meta">
+                <dt>Config file</dt>
+                <dd id="about-config">—</dd>
+            </dl>
+            <div class="about-actions">
+                <button id="about-repo">Source code</button>
+                <button id="about-close">Close</button>
+            </div>
+        </dialog>
     </body>
 </html>

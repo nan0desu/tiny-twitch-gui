@@ -64,9 +64,9 @@ pub async fn wait_for_token() -> Result<String> {
             .to_string();
 
         let done = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n\
-            <html><meta charset='utf-8'><body style='font-family:sans-serif;text-align:center;padding:4rem'>\
-            <h2>Авторизация прошла успешно!</h2>\
-            <p>Можно закрыть это окно.</p></body></html>";
+            <html lang='en'><meta charset='utf-8'><body style='font-family:sans-serif;text-align:center;padding:4rem'>\
+            <h2>Authorization successful!</h2>\
+            <p>You can close this window.</p></body></html>";
         stream2.write_all(done.as_bytes()).await?;
 
         Ok(token)

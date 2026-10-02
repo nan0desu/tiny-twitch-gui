@@ -9,11 +9,37 @@ use std::sync::Mutex;
 use tauri::State;
 
 const CLIENT_ID: &str = env!("TWITCH_CLIENT_ID");
+const REPO_URL: &str = "https://github.com/nan0desu/tiny-twitch-gui";
 
 struct AppState {
     token: Mutex<Option<TokenData>>,
     user_id: Mutex<Option<String>>,
     config: Mutex<Config>,
+}
+
+#[derive(serde::Serialize)]
+struct AppInfo {
+    version: String,
+    config_path: String,
+    repo_url: String,
+}
+
+/// Read straight from the binary so the About dialog can never drift from
+/// what `bump.sh` wrote into Cargo.toml.
+#[tauri::command]
+fn app_info() -> AppInfo {
+    AppInfo {
+        version: env!("CARGO_PKG_VERSION").to_string(),
+        config_path: config::config_path().display().to_string(),
+        repo_url: REPO_URL.to_string(),
+    }
+}
+
+/// Takes no argument on purpose: the webview can open this one URL and nothing
+/// else, so this is not a general-purpose opener.
+#[tauri::command]
+fn open_repo() -> Result<(), String> {
+    open::that(REPO_URL).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -142,6 +168,8 @@ pub fn run() {
             open_stream,
             logout,
             is_authenticated,
+            app_info,
+            open_repo,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
